@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# 보안 키 폴더는 깃허브에 올리지 않음
+keys/
