@@ -220,3 +220,19 @@ __marimo__/
 
 # 보안 키 폴더는 깃허브에 올리지 않음
 keys/
+
+
+# AES 비밀키 파일 제외
+key.bin
+
+# AES 암호화 결과 파일 제외
+encrypted.bin
+
+# SHA-256 HASH 결과 파일 제외
+hash.txt
+
+# 복호화 결과 파일 제외
+decrypted.txt
+
+# Python 캐시 폴더 제외
+__pycache__/
