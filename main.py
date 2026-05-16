@@ -38,7 +38,7 @@ def process_and_upload(file_path):
 
 # --- 테스트 실행 부분 ---
 if __name__ == "__main__":
-    # 변경된 경로 적용! 👇
+    # 변경된 경로 적용!
     target_file = "data/final_test_data.txt" 
     with open(target_file, "w", encoding="utf-8") as f:
         f.write("이 중요한 데이터는 암호화 과정을 거친 뒤에 IPFS 네트워크로 날아갈 것입니다.")
