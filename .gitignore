@@ -236,3 +236,13 @@ decrypted.txt
 
 # Python 캐시 폴더 제외
 __pycache__/
+# AES 키 및 암호화 키
+aes_key.bin
+encrypted_key.bin
+
+# RSA 병원 키
+hospital_private.pem
+hospital_public.pem
+
+# 복호화 결과
+decrypted.json
