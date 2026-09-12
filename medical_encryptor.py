@@ -47,7 +47,7 @@ def encrypt_medical_data(medical_data):
 
 if __name__ == "__main__":
 
-    # 가은님이 만든 의료데이터 불러오기
+    # 의료데이터 불러오기
     with open("sample_medical_data.json", "r", encoding="utf-8") as f:
         medical_data = json.load(f)
 
