@@ -1,12 +1,12 @@
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import unpad
 import hashlib
+import json
 
 # =========================
 # 1. AES 비밀키 읽기
 # =========================
 
-with open("key.bin", "rb") as f:
+with open("aes_key.bin", "rb") as f:
     key = f.read()
 
 # =========================
@@ -14,63 +14,80 @@ with open("key.bin", "rb") as f:
 # =========================
 
 with open("encrypted.bin", "rb") as f:
-    iv = f.read(16)          # IV 읽기
-    ciphertext = f.read()   # 암호문 읽기
+    encrypted_data = f.read()
+
+# GCM nonce = 16바이트
+nonce = encrypted_data[:16]
+
+# tag = 16바이트
+tag = encrypted_data[16:32]
+
+# 나머지 = ciphertext
+ciphertext = encrypted_data[32:]
 
 # =========================
-# 3. AES 복호화
+# 3. AES-256-GCM 복호화
 # =========================
-
-cipher = AES.new(key, AES.MODE_CBC, iv)
 
 try:
-    plaintext = unpad(
-        cipher.decrypt(ciphertext),
-        AES.block_size
+    cipher = AES.new(
+        key,
+        AES.MODE_GCM,
+        nonce=nonce
+    )
+
+    plaintext = cipher.decrypt_and_verify(
+        ciphertext,
+        tag
     )
 
 except ValueError:
     print("복호화 실패")
-    print("암호화 데이터가 변조되었을 가능성이 있습니다.")
+    print("데이터가 변조되었거나 잘못된 키입니다.")
     exit()
 
 # =========================
 # 4. 복호화 결과 저장
 # =========================
 
-with open("decrypted.txt", "wb") as f:
+with open("decrypted.json", "wb") as f:
     f.write(plaintext)
 
 print("복호화 완료")
-print("decrypted.txt 생성 완료")
+print("decrypted.json 생성 완료")
 
 # =========================
-# 5. 기존 HASH 읽기
+# 5. SHA-256 무결성 검증
 # =========================
 
-with open("hash.txt", "r") as f:
-    original_hash = f.read()
+# 복호화된 데이터의 HASH
+decrypted_hash = hashlib.sha256(plaintext).hexdigest()
 
-# =========================
-# 6. 복호화 데이터 HASH 생성
-# =========================
+print("\n복호화 데이터 SHA-256:")
+print(decrypted_hash)
 
-new_hash = hashlib.sha256(plaintext).hexdigest()
+# 원본 sample JSON을 동일한 방식으로 직렬화
+with open("sample_medical_data.json", "r", encoding="utf-8") as f:
+    original_data = json.load(f)
 
-# =========================
-# 7. HASH 비교 검증
-# =========================
+original_bytes = json.dumps(
+    original_data,
+    ensure_ascii=False,
+    separators=(",", ":")
+).encode("utf-8")
 
-print("\n원본 HASH:")
+original_hash = hashlib.sha256(original_bytes).hexdigest()
+
+print("\n원본 데이터 SHA-256:")
 print(original_hash)
 
-print("\n복호화 데이터 HASH:")
-print(new_hash)
+# =========================
+# 6. HASH 비교
+# =========================
 
-if original_hash == new_hash:
+if decrypted_hash == original_hash:
     print("\n무결성 검증 성공")
-    print("데이터가 변조되지 않았습니다.")
-
+    print("복호화된 데이터가 원본과 일치합니다.")
 else:
     print("\n무결성 검증 실패")
-    print("데이터 변조 가능성이 있습니다.")
+    print("데이터가 변조되었거나 암호화 과정과 데이터가 다릅니다.")

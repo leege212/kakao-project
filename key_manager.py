@@ -42,3 +42,20 @@ def encrypt_aes_key(aes_key):
         f.write(encrypted_key)
 
     return encrypted_key
+
+
+def decrypt_aes_key(encrypted_key):
+    # 병원 개인키 불러오기
+    with open("hospital_private.pem", "rb") as f:
+        private_key = RSA.import_key(f.read())
+
+    # RSA-OAEP + SHA-256
+    cipher = PKCS1_OAEP.new(
+        private_key,
+        hashAlgo=SHA256
+    )
+
+    # 암호화된 AES Key 복호화
+    aes_key = cipher.decrypt(encrypted_key)
+
+    return aes_key
