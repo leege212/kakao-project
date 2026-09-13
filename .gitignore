@@ -246,3 +246,5 @@ hospital_public.pem
 
 # 복호화 결과
 decrypted.json
+
+sample_medical_data.json
