@@ -10,9 +10,9 @@ def encrypt_medical_data(medical_data):
     SHA-256 HASH를 생성한다.
 
     반환값:
-        encrypted_data : 암호화된 데이터
-        aes_key        : AES 암호화 키
-        file_hash      : SHA-256 HASH
+        encrypted_data : 암호화된 의료데이터
+        aes_key        : AES-256 암호화 키
+        file_hash      : 암호화된 데이터의 SHA-256 HASH
     """
 
     # 1. 의료데이터 JSON → bytes
@@ -23,6 +23,7 @@ def encrypt_medical_data(medical_data):
     ).encode("utf-8")
 
     # 2. AES-256 Key 생성
+    # 데이터마다 새로운 32바이트 키 생성
     aes_key = get_random_bytes(32)
 
     # 3. AES-256-GCM 암호화
@@ -37,7 +38,7 @@ def encrypt_medical_data(medical_data):
         ciphertext
     )
 
-    # 5. SHA-256 HASH 생성
+    # 5. 암호화된 데이터의 SHA-256 HASH 생성
     file_hash = hashlib.sha256(
         encrypted_data
     ).hexdigest()
@@ -47,8 +48,12 @@ def encrypt_medical_data(medical_data):
 
 if __name__ == "__main__":
 
-    # 의료데이터 불러오기
-    with open("sample_medical_data.json", "r", encoding="utf-8") as f:
+    # 테스트용 의료데이터 불러오기
+    with open(
+        "sample_medical_data.json",
+        "r",
+        encoding="utf-8"
+    ) as f:
         medical_data = json.load(f)
 
     # 암호화
@@ -60,7 +65,8 @@ if __name__ == "__main__":
     with open("encrypted.bin", "wb") as f:
         f.write(encrypted_data)
 
-    # AES Key 저장
+    # 테스트용 AES Key 저장
+    # 실제 서비스에서는 평문 AES Key를 파일로 저장하지 않음
     with open("aes_key.bin", "wb") as f:
         f.write(aes_key)
 
@@ -69,4 +75,5 @@ if __name__ == "__main__":
         f.write(file_hash)
 
     print("의료데이터 암호화 완료")
+    print(f"AES Key 길이: {len(aes_key)} bytes")
     print(f"SHA-256: {file_hash}")
